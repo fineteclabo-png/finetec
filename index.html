@@ -1213,7 +1213,11 @@ function buildPrintArea(d) {
     +'<tr><td style="'+mtk+'">患者氏名</td><td style="'+mtv+'">'+def(d.patientId)+'</td><td style="'+mtk+'">発行日</td><td style="'+mtvs+'">'+def(d.submittedAt)+'</td></tr>'
     +'<tr><td style="'+mtk+'">年齢・性別</td><td style="'+mtvs+'" colspan="3">'+def(d.patientAge)+' / '+def(d.patientGender)+'</td></tr></table>'
     +'<div style="'+stl+'">&#9650; 納期</div>'
-    +'<table style="'+gt+'"><tr><td style="'+gk+'">指示書発行日</td><td style="'+gvb+'" colspan="3">'+def(d.issueDate)+'</td></tr><tr><td style="'+gk+'">納品希望日</td><td style="'+gvb+'" colspan="3">'+def(d.dueDate)+'</td></tr><tr><td style="'+gk+'">優先度</td><td style="'+gvb+'" colspan="3">'+def(d.priority)+'</td></tr></table>'
+    +'<table style="'+gt+'">'
+    +'<tr><td style="'+gk+'">指示書発行日</td><td style="'+f+'font-size:12pt;font-weight:bold;padding:3px 6px;border-bottom:1px solid #ddd;" colspan="3">'+def(d.issueDate)+'</td></tr>'
+    +'<tr><td style="'+gk+'">納品希望日</td><td style="'+f+'font-size:12pt;font-weight:bold;padding:3px 6px;border-bottom:1px solid #ddd;" colspan="3">'+def(d.dueDate)+'</td></tr>'
+    +'<tr><td style="'+gk+'">納期</td><td style="'+gvb+'" colspan="3">'+def(d.priority)+'</td></tr>'
+    +'</table>'
     +'<div style="'+stl+'">&#9650; 補綴物情報'+((d.items&&d.items.length)?'（'+d.items.length+'件）':'')+'</div>'
     +buildItemsHtml()
     +'<table style="'+gt+'"><tr><td style="'+gk+'">対合歯の状態</td><td style="'+gv2+'" colspan="3">'+def(d.opposing)+'</td></tr></table>'
