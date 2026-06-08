@@ -1131,7 +1131,7 @@ function mkRow(k, v) { return '<div class="cfm-row"><span class="cfm-k">' + k + 
 function sec(id, rows) { document.getElementById(id).innerHTML = rows.map(function(r){ return mkRow(r[0],r[1]); }).join(""); }
 
 function showCfm() {
-  if (!validate(6)) return;
+  if (!validate(5)) return;
   var g = document.querySelector("#g_gender .rc.sel");
   var op = document.querySelector("#g_opposing .rc.sel");
   sec("cfm_c", [["医院名",gv("clinicName")],["歯科医師名",gv("doctorName")],["担当スタッフ",gv("staffName")||"―"],["電話番号",gv("clinicTel")],["メールアドレス",gv("clinicEmail")]]);
@@ -1227,16 +1227,25 @@ function buildPrintArea(d) {
     +   (function(){
           var its = (d.items && d.items.length) ? d.items : [];
           if (!its.length) return '<div class="pr-row"><span class="pr-k">補綴明細</span><span class="pr-v">―</span></div>';
+          var thFs = its.length <= 3 ? '7.5pt' : its.length <= 6 ? '6.5pt' : '5.5pt';
+          var tdFs = its.length <= 3 ? '8.5pt' : its.length <= 6 ? '7pt'   : '6pt';
+          var tdPd = its.length <= 3 ? '1mm 1.5mm' : its.length <= 6 ? '0.6mm 1mm' : '0.4mm 0.8mm';
           var h = '<table class="pr-itbl"><tr>'
-                + '<th style="width:9mm">No</th><th style="width:26mm">歯番</th>'
-                + '<th>補綴物の種類</th><th>使用材料</th><th style="width:20mm">シェード</th></tr>';
+                + '<th style="width:9mm;font-size:'+thFs+'">No</th>'
+                + '<th style="width:26mm;font-size:'+thFs+'">歯番</th>'
+                + '<th style="font-size:'+thFs+'">補綴物の種類</th>'
+                + '<th style="font-size:'+thFs+'">使用材料</th>'
+                + '<th style="width:20mm;font-size:'+thFs+'">シェード</th></tr>';
           its.forEach(function(it,i){
             var sh = def(it.shade) + (it.shadeNote ? '（' + it.shadeNote + '）' : '');
-            h += '<tr><td>' + (i+1) + (it.bridge ? '<span class="brm"> 複数</span>' : '') + '</td>'
-               + '<td class="tn">' + def(it.teethLabel) + '</td>'
-               + '<td class="tl">' + def(it.type) + '</td>'
-               + '<td class="tl">' + def(it.material) + '</td>'
-               + '<td>' + sh + '</td></tr>';
+            h += '<tr>'
+               + '<td style="font-size:'+tdFs+';padding:'+tdPd+';">'
+               + (i+1) + (it.bridge ? '<span class="brm"> 複数</span>' : '') + '</td>'
+               + '<td class="tn" style="font-size:'+tdFs+';padding:'+tdPd+';">'+def(it.teethLabel)+'</td>'
+               + '<td class="tl" style="font-size:'+tdFs+';padding:'+tdPd+';">'+def(it.type)+'</td>'
+               + '<td class="tl" style="font-size:'+tdFs+';padding:'+tdPd+';">'+def(it.material)+'</td>'
+               + '<td style="font-size:'+tdFs+';padding:'+tdPd+';">'+sh+'</td>'
+               + '</tr>';
           });
           return h + '</table>';
         })()
@@ -1342,7 +1351,7 @@ function retry() {
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register('/finetec/sw.js')
         .then(function(reg) { console.log('SW登録完了:', reg.scope); })
         .catch(function(err) { console.log('SW登録失敗:', err); });
     });
