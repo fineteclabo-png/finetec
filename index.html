@@ -259,53 +259,17 @@ select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='htt
 .btn-print{background:linear-gradient(135deg,#5a6478 0%,#3d4556 100%);color:#fff;box-shadow:0 4px 16px rgba(61,69,86,.28)}
 .btn-print:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(61,69,86,.38)}
 
-/* ══════════════════════════════════════════════
-   印刷用レイアウト（A5 作業指示書）
-   @media print で表示 / 通常時は非表示
-══════════════════════════════════════════════ */
+/* 印刷用 */
 #printArea{display:none}
 
 @media print {
-  /* printArea以外をすべて非表示 */
-  .hdr, .prg, .main, .ov { display:none !important; }
+  .hdr, .hist-bar, .prg, .main, .ov { display:none !important; }
   #printArea{
     display:block !important;
-    width:100%;
-    min-height:auto;
-    margin:0 auto; padding:0;
-    font-family:"BIZ UDPGothic","メイリオ",sans-serif;
-    font-size:12pt;
-    color:#000;
+    margin:0; padding:0;
     background:#fff;
-    box-sizing:border-box;
-    text-align:left;
-    line-height:1.6;
   }
-  @page { size:A5 portrait; margin:3mm; }
-
-  .pr-logo{font-size:7pt;color:#555;text-align:right;margin-bottom:1mm;border-bottom:0.3mm solid #999;padding-bottom:1mm}
-  .pr-title{font-size:15pt;font-weight:bold;text-align:center;letter-spacing:4px;margin-bottom:2mm}
-  .pr-meta{display:grid;grid-template-columns:1fr 1fr;gap:0.5mm 3mm;margin-bottom:2mm;padding:2mm 3mm;border:0.3mm solid #aaa;background:#f8f8f8;page-break-inside:avoid}
-  .pr-meta-item{font-size:8.5pt;display:flex;gap:1.5mm;align-items:baseline;padding:0.3mm 0}
-  .pr-meta-item .pk{font-size:7.5pt;color:#444;white-space:nowrap;min-width:20mm}
-  .pr-meta-item .pv{font-weight:bold;font-size:9pt}
-  .pr-meta-item.wide{grid-column:1/-1}
-  .pr-sec{margin-bottom:2mm;page-break-inside:avoid}
-  .pr-sec-ttl{font-size:8.5pt;font-weight:bold;letter-spacing:1px;border-bottom:0.5mm solid #333;margin-bottom:1mm;padding-bottom:0.5mm}
-  .pr-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 3mm}
-  .pr-row{display:flex;gap:1.5mm;align-items:baseline;padding:1mm 0;border-bottom:0.2mm dotted #ccc}
-  .pr-row:last-child{border-bottom:none}
-  .pr-k{font-size:7.5pt;color:#444;white-space:nowrap;min-width:20mm;flex-shrink:0}
-  .pr-v{font-size:9pt;font-weight:500;word-break:break-all}
-  .pr-notes{border:0.3mm solid #aaa;padding:2mm;min-height:8mm;font-size:8.5pt;white-space:pre-wrap;word-break:break-all;line-height:1.6}
-  .pr-footer{margin-top:2mm;padding-top:1.5mm;border-top:0.3mm solid #aaa;font-size:7pt;color:#555;text-align:center}
-  .pr-teeth{font-size:9pt;font-weight:bold;letter-spacing:1px;background:#f0f0f0;padding:1mm 2mm;display:inline-block;border:0.3mm solid #aaa}
-  .pr-itbl{width:100%;border-collapse:collapse;margin-bottom:1.5mm}
-  .pr-itbl th{font-size:7.5pt;background:#ededed;border:0.3mm solid #999;padding:1mm 1.5mm;color:#333;font-weight:bold}
-  .pr-itbl td{font-size:8.5pt;border:0.3mm solid #aaa;padding:1mm 1.5mm;text-align:center}
-  .pr-itbl td.tl{text-align:left;font-weight:500}
-  .pr-itbl td.tn{font-weight:bold;letter-spacing:0.5px}
-  .pr-itbl .brm{font-size:7pt;color:#b03a2e}
+  @page { size:A4 portrait; margin:10mm; }
 }
 </style>
 </head>
@@ -1209,161 +1173,84 @@ function doSub() {
 
 // ─── 印刷エリアの生成 ───
 function buildPrintArea(d) {
-  var def = function(v){ return v && String(v).trim() ? String(v).trim() : "—"; };
-  var f   = "font-family:'BIZ UDPGothic',Meiryo,sans-serif;";
-  var dc  = d.modelShip === 'あり';  // modelShip=スキャンデータ
-  var ms  = d.dataCloud === 'あり';  // dataCloud=石膏模型
+  var def = function(v){ return v && v.trim() ? v : "―"; };
+  var html = ''
+    + '<div class="pr-logo">（株）ファインテック　〒882-0866 宮崎県延岡市平原町5丁目696-1 2F　TEL 0982-35-4630</div>'
+    + '<div class="pr-title">歯　科　技　工　指　示　書</div>'
+    + '<div class="pr-meta">'
+    +   '<div class="pr-meta-item"><span class="pk">医院名</span><span class="pv">' + def(d.clinicName) + '</span></div>'
+    +   '<div class="pr-meta-item"><span class="pk">送信日時</span><span class="pv">' + def(d.submittedAt) + '</span></div>'
+    +   '<div class="pr-meta-item"><span class="pk">歯科医師名</span><span class="pv">' + def(d.doctorName) + '</span></div>'
+    +   '<div class="pr-meta-item"><span class="pk">担当スタッフ</span><span class="pv">' + def(d.staffName) + '</span></div>'
+    +   '<div class="pr-meta-item"><span class="pk">患者名</span><span class="pv">' + def(d.patientId) + '</span></div>'
+    +   '<div class="pr-meta-item"><span class="pk">年齢 / 性別</span><span class="pv">'
+    +     (d.patientAge ? d.patientAge + '歳' : '―') + ' / ' + def(d.patientGender) + '</span></div>'
+    + '</div>'
 
-  var wrap = f+"font-size:8.5pt;color:#000;width:100%;max-width:540px;margin:0 auto;background:#fff;padding:8px 0;";
-  var hdr  = f+"font-size:7pt;color:#333;text-align:right;padding:0 0 3px;border-bottom:1px solid #888;margin-bottom:4px;";
-  var ttl  = f+"font-size:13pt;font-weight:bold;text-align:center;letter-spacing:4px;padding:5px 0 6px;";
-  var mt   = "width:100%;border-collapse:collapse;border:1px solid #999;margin-bottom:5px;background:#f7f7f7;";
-  var mtk  = f+"font-size:7.5pt;color:#444;white-space:nowrap;padding:3px 6px;border:1px solid #bbb;width:75px;";
-  var mtv  = f+"font-size:9pt;font-weight:bold;padding:3px 8px;border:1px solid #bbb;";
-  var mtvs = f+"font-size:8pt;padding:3px 8px;border:1px solid #bbb;";
-  var stl  = f+"font-size:8pt;font-weight:bold;border-bottom:1.5px solid #333;padding-bottom:2px;margin:6px 0 3px;letter-spacing:1px;";
-  var gt   = "width:100%;border-collapse:collapse;margin-bottom:3px;";
-  var gk   = f+"font-size:7.5pt;color:#555;white-space:nowrap;padding:2px 6px;border-bottom:1px solid #ddd;width:90px;background:#fafafa;";
-  var gv2  = f+"font-size:8pt;padding:2px 8px;border-bottom:1px solid #ddd;";
-  var gvb  = f+"font-size:8pt;font-weight:bold;padding:2px 8px;border-bottom:1px solid #ddd;";
-  var sig  = "border-top:1px solid #999;margin-top:8px;padding-top:5px;";
-  var sigr = "width:100%;border-collapse:collapse;";
-  var sigk = f+"font-size:7pt;color:#555;padding:2px 6px;border:1px solid #ddd;background:#f5f5f5;white-space:nowrap;";
-  var sigv = f+"font-size:8pt;padding:2px 8px;border:1px solid #ddd;";
+    + '<div class="pr-sec"><div class="pr-sec-ttl">■ 補綴物の詳細</div>'
+    +   (function(){
+          var its = (d.items && d.items.length) ? d.items : [];
+          if (!its.length) return '<div class="pr-row"><span class="pr-k">補綴明細</span><span class="pr-v">―</span></div>';
+          var thFs = its.length <= 3 ? '7.5pt' : its.length <= 6 ? '6.5pt' : '5.5pt';
+          var tdFs = its.length <= 3 ? '8.5pt' : its.length <= 6 ? '7pt'   : '6pt';
+          var tdPd = its.length <= 3 ? '1mm 1.5mm' : its.length <= 6 ? '0.6mm 1mm' : '0.4mm 0.8mm';
+          var h = '<table class="pr-itbl"><tr>'
+                + '<th style="width:9mm;font-size:'+thFs+'">No</th>'
+                + '<th style="width:26mm;font-size:'+thFs+'">歯番</th>'
+                + '<th style="font-size:'+thFs+'">補綴物の種類</th>'
+                + '<th style="font-size:'+thFs+'">使用材料</th>'
+                + '<th style="width:20mm;font-size:'+thFs+'">シェード</th></tr>';
+          its.forEach(function(it,i){
+            var sh = def(it.shade) + (it.shadeNote ? '（' + it.shadeNote + '）' : '');
+            h += '<tr>'
+               + '<td style="font-size:'+tdFs+';padding:'+tdPd+';">'
+               + (i+1) + (it.bridge ? '<span class="brm"> 複数</span>' : '') + '</td>'
+               + '<td class="tn" style="font-size:'+tdFs+';padding:'+tdPd+';">'+def(it.teethLabel)+'</td>'
+               + '<td class="tl" style="font-size:'+tdFs+';padding:'+tdPd+';">'+def(it.type)+'</td>'
+               + '<td class="tl" style="font-size:'+tdFs+';padding:'+tdPd+';">'+def(it.material)+'</td>'
+               + '<td style="font-size:'+tdFs+';padding:'+tdPd+';">'+sh+'</td>'
+               + '</tr>';
+          });
+          return h + '</table>';
+        })()
+    +   '<div class="pr-row"><span class="pr-k">対合歯の状態</span><span class="pr-v">' + def(d.opposing) + '</span></div>'
+    + '</div>'
 
-  // 補綴物テーブル
-  function buildItemsHtml() {
-    var its = (d.items && d.items.length) ? d.items : [];
-    if (!its.length) return '<table style="'+gt+'"><tr><td style="'+gk+'">補綴明細</td><td style="'+gv2+'">—</td></tr></table>';
-    var fs = its.length <= 3 ? '8pt' : its.length <= 6 ? '7pt' : '6pt';
-    var pd = its.length <= 3 ? '2px 6px' : its.length <= 6 ? '1px 4px' : '1px 3px';
-    var th = f+"font-size:7pt;color:#444;white-space:nowrap;padding:2px 6px;border:1px solid #bbb;background:#f0f0f0;";
-    var td = f+"font-size:"+fs+";padding:"+pd+";border:1px solid #ccc;";
-    var tdb= f+"font-size:"+fs+";font-weight:bold;padding:"+pd+";border:1px solid #ccc;";
-    var h = '<table style="width:100%;border-collapse:collapse;margin-bottom:3px;">'
-          + '<tr>'
-          + '<th style="'+th+'width:20px;">No</th>'
-          + '<th style="'+th+'width:55px;">歯番</th>'
-          + '<th style="'+th+'">補綴物の種類</th>'
-          + '<th style="'+th+'">使用材料</th>'
-          + '<th style="'+th+'width:45px;">シェード</th>'
-          + '</tr>';
-    its.forEach(function(it, i) {
-      var sh = def(it.shade) + (it.shadeNote ? '（'+it.shadeNote+'）' : '');
-      h += '<tr>'
-         + '<td style="'+td+'text-align:center;">'+(i+1)+(it.bridge ? '<span style="font-size:6pt;color:#b03a2e;"> 複数</span>':'')+'</td>'
-         + '<td style="'+tdb+'text-align:center;">'+def(it.teethLabel)+'</td>'
-         + '<td style="'+td+'">'+def(it.type)+'</td>'
-         + '<td style="'+td+'">'+def(it.material)+'</td>'
-         + '<td style="'+td+'text-align:center;">'+sh+'</td>'
-         + '</tr>';
-    });
-    return h + '</table>';
-  }
 
-  var html = '<div style="'+wrap+'">'
-    +'<div style="'+ttl+'">歯 科 技 工 指 示 書</div>'
+    + '<div class="pr-sec"><div class="pr-sec-ttl">■ スキャンデータ</div>'
+    +   '<div class="pr-grid">'
+    +   '<div class="pr-row"><span class="pr-k">添付ファイル</span><span class="pr-v">' + def(d.scanFileName) + '</span></div>'
+    +   '<div class="pr-row"><span class="pr-k">スキャナー</span><span class="pr-v">' + def(d.scanner) + '</span></div>'
+    +   '</div>'
+    +   (d.scannerNote && d.scannerNote.trim() ? '<div class="pr-row"><span class="pr-k">スキャナー補足</span><span class="pr-v">' + d.scannerNote + '</span></div>' : '')
+    + '</div>'
 
-    +'<table style="'+mt+'">'
-    +'<tr><td style="'+mtk+'">医院名</td><td style="'+mtv+'">'+def(d.clinicName)+'</td>'
-    +'<td style="'+mtk+'">歯科医師</td><td style="'+mtv+'">'+def(d.doctorName)+' 先生</td></tr>'
-    +'<tr><td style="'+mtk+'">所在地</td><td style="'+mtv+'" colspan="3">'+def(d.clinicAddress)+'</td></tr>'
-    +'<tr><td style="'+mtk+'">電話番号</td><td style="'+mtv+'">'+def(d.clinicTel)+'</td>'
-    +'<td style="'+mtk+'">メール</td><td style="'+mtvs+'">'+def(d.clinicEmail)+'</td></tr>'
-    +'<tr><td style="'+mtk+'">患者氏名</td><td style="'+mtv+'">'+def(d.patientId)+'</td>'
-    +'<td style="'+mtk+'">発行日</td><td style="'+mtvs+'">'+def(d.submittedAt)+'</td></tr>'
-    +'<tr><td style="'+mtk+'">年齢・性別</td><td style="'+mtvs+'" colspan="3">'+def(d.patientAge)+' / '+def(d.patientGender)+'</td></tr>'
-    +'</table>'
+    + '<div class="pr-sec"><div class="pr-sec-ttl">■ 納期・備考</div>'
+    +   '<div style="display:flex;align-items:flex-start;gap:2mm;margin-bottom:1mm;">'
+    +   '<div style="flex:1;">'
+    +   '<div class="pr-row"><span class="pr-k">指示書発行日</span><span class="pr-v" style="font-size:11pt;font-weight:bold">' + def(d.issueDate) + '</span></div>'
+    +   '<div class="pr-row"><span class="pr-k">納品希望日</span><span class="pr-v" style="font-size:11pt;font-weight:bold">' + def(d.dueDate) + '</span></div>'
+    +   '</div>'
+    +   '<div style="text-align:right;white-space:nowrap;padding-top:1mm;">'
+    +   '<span style="font-size:8pt;color:#444;">納期　</span><span style="font-size:11pt;font-weight:bold;">' + def(d.priority) + '</span>'
+    +   '</div>'
+    +   '</div>'
+    +   (function(){
+          var ms = d.modelShip === 'あり';
+          var dc = d.dataCloud === 'あり';
+          return '<div style="padding:1mm 0;margin:1mm 0;text-align:center;font-size:10pt;font-weight:bold;letter-spacing:2px;">'
+            + '<span style="margin-right:18px;"><span style="font-size:15pt;vertical-align:-1px;">' + (ms?'☑':'☐') + '</span>　ス キ ャ ン デ ー タ</span>'
+            + '<span><span style="font-size:15pt;vertical-align:-1px;">' + (dc?'☑':'☐') + '</span>　石 膏 模 型</span>'
+            + '</div>';
+        })()
+    +   '<div style="margin-top:1.5mm"><span style="font-size:7.5pt;color:#444">設計の指示・特記事項：</span><div class="pr-notes">' + (d.notes && d.notes.trim() ? d.notes : '　') + '</div></div>'
+    + '</div>'
 
-    +'<div style="'+stl+'">&#9650; 納期</div>'
-    +'<table style="'+gt+'">'
-    +'<tr><td style="'+gk+'">指示書発行日</td><td style="'+f+'font-size:10pt;font-weight:bold;padding:3px 8px;border-bottom:1px solid #ddd;" colspan="3">'+def(d.issueDate)+'</td></tr>'
-    +'<tr><td style="'+gk+'">納品希望日</td><td style="'+f+'font-size:10pt;font-weight:bold;padding:3px 8px;border-bottom:1px solid #ddd;" colspan="3">'+def(d.dueDate)+'</td></tr>'
-    +'<tr><td style="'+gk+'">優先度</td><td style="'+gvb+'" colspan="3">'+def(d.priority)+'</td></tr>'
-    +'</table>'
-
-    +'<div style="'+stl+'">&#9650; 補綴物情報'+((d.items&&d.items.length)?'（'+d.items.length+'件）':'')+'</div>'
-    + buildItemsHtml()
-    +'<table style="'+gt+'">'
-    +'<tr><td style="'+gk+'">対合歯の状態</td><td style="'+gv2+'" colspan="3">'+def(d.opposing)+'</td></tr>'
-    +'</table>'
-
-    +'<div style="'+stl+'">&#9650; 設計・作製方法</div>'
-    +'<table style="'+gt+'">'
-    +'<tr><td style="'+gk+'">形態・設計の指示</td><td style="'+gvb+'" colspan="3">'+def(d.design)+'</td></tr>'
-    +'</table>'
-
-    +'<div style="'+stl+'">&#9650; スキャンデータ</div>'
-    +'<table style="'+gt+'">'
-    +'<tr><td style="'+gk+'">添付ファイル</td><td style="'+gv2+'">'+def(d.scanFileName)+'</td>'
-    +'<td style="'+gk+'">スキャナー</td><td style="'+gv2+'">'+def(d.scanner)+'</td></tr>'
-    +(d.scannerNote && d.scannerNote.trim() ? '<tr><td style="'+gk+'">スキャナー補足</td><td style="'+gv2+'" colspan="3">'+def(d.scannerNote)+'</td></tr>' : '')
-    +'</table>'
-
-    +'<div style="'+stl+'">&#9650; 送付方法・備考</div>'
-    +'<div style="'+f+'padding:2px 0;margin:2px 0;text-align:center;font-size:11.5pt;font-weight:bold;letter-spacing:2px;color:#000;">'
-    +'<span style="margin-right:18px;"><span style="font-size:15pt;vertical-align:-1px;">'+(dc?'&#9745;':'&#9744;')+'</span>　ス キ ャ ン デ ー タ</span>'
-    +'<span style="color:#999;margin-right:18px;">|</span>'
-    +'<span><span style="font-size:15pt;vertical-align:-1px;">'+(ms?'&#9745;':'&#9744;')+'</span>　石 膏 模 型</span>'
-    +'</div>'
-    +'<div style="'+f+'font-size:10.5pt;color:#555;margin:2px 0 1px;">特記事項・備考：</div>'
-    +'<div style="'+f+'font-size:11pt;border:1px solid #bbb;min-height:30px;padding:3px 6px;background:#fff;">'+(d.notes && d.notes.trim() ? d.notes : '　')+'</div>'
-
-    +'<div style="'+sig+'">'
-    +'<table style="'+sigr+'">'
-    +'<tr>'
-    +'<td style="'+sigk+'">担当歯科技工士</td><td style="'+sigv+'">新名　隆治</td>'
-    +'</tr>'
-    +'</table>'
-    +'</div>'
-
-    +'<div style="'+f+'font-size:8pt;color:#888;text-align:right;margin-top:3px;border-top:1px solid #eee;padding-top:2px;">'
-    +'本指示書は歯科技工士法第18条に基づく法定文書です。2年間保管してください。</div>'
-
-    +'<div style="border-top:2px solid #1a2a4f;margin-top:10px;padding-top:8px;">'
-    +'<table style="width:100%;border-collapse:collapse;">'
-    +'<tr>'
-    +'<td style="width:38%;vertical-align:middle;padding-right:10px;border-right:1px solid #ccc;">'
-    +'<div style="display:flex;align-items:center;gap:8px;">'
-    +'<svg width="32" height="32" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">'
-    +'<path d="M40 8C28 8 18 18 18 30c0 8 4 15 10 20l4 20h16l4-20c6-5 10-12 10-20C62 18 52 8 40 8z" fill="#1a2a4f"/>'
-    +'<path d="M33 30c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7z" fill="#fff"/>'
-    +'<path d="M36 44l-2 12h12l-2-12H36z" fill="#1a2a4f"/>'
-    +'</svg>'
-    +'<div>'
-    +'<div style="font-family:Meiryo,sans-serif;font-size:11pt;font-weight:bold;color:#1a2a4f;letter-spacing:3px;line-height:1;">FINETEC</div>'
-    +'<div style="font-family:Meiryo,sans-serif;font-size:5.5pt;color:#1a2a4f;letter-spacing:2px;margin-top:2px;">D E N T A L &nbsp; L A B O R A T O R Y</div>'
-    +'</div>'
-    +'</div>'
-    +'<div style="font-family:Meiryo,sans-serif;font-size:8pt;font-weight:bold;color:#1a2a4f;margin-top:4px;letter-spacing:1px;">株式会社　ファインテック</div>'
-    +'</td>'
-    +'<td style="width:62%;vertical-align:middle;padding-left:12px;">'
-    +'<table style="border-collapse:collapse;width:100%;">'
-    +'<tr>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:10pt;color:#555;padding:1px 0;width:18px;text-align:center;">&#9675;</td>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:9pt;color:#555;padding:1px 6px 1px 2px;white-space:nowrap;">所在地</td>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:9pt;color:#1a2a4f;padding:1px 0;white-space:nowrap;">〒882-0866 宮崎県延岡市平原町5丁目696番地1</td></tr>'
-    +'<tr>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:10pt;color:#555;padding:1px 0;width:18px;text-align:center;">&#9742;</td>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:9pt;color:#555;padding:1px 6px 1px 2px;white-space:nowrap;">TEL</td>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:9pt;color:#1a2a4f;padding:1px 0;">0982-35-4630</td></tr>'
-    +'<tr>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:10pt;color:#555;padding:1px 0;width:18px;text-align:center;">&#128241;</td>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:9pt;color:#555;padding:1px 6px 1px 2px;white-space:nowrap;">Mobile</td>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:9pt;color:#1a2a4f;padding:1px 0;">090-5930-0347</td></tr>'
-    +'<tr>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:10pt;color:#555;padding:1px 0;width:18px;text-align:center;">&#9993;</td>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:9pt;color:#555;padding:1px 6px 1px 2px;white-space:nowrap;">MAIL</td>'
-    +'<td style="font-family:Meiryo,sans-serif;font-size:9pt;color:#1a2a4f;padding:1px 0;">fineteclabo@gmail.com</td></tr>'
-    +'</table>'
-    +'</td>'
-    +'</tr>'
-    +'</table>'
-    +'</div>'
-    +'</div>';
+    + '<div class="pr-footer">（株）ファインテック　TEL 0982-35-4630 / Mobile 090-5930-0347<br>※本指示書は歯科技工士法第18条に基づいて発行されています</div>';
 
   document.getElementById("printArea").innerHTML = html;
 }
+
 function doPrint() {
   if (!fData) { alert("送信データがありません"); return; }
   window.print();
