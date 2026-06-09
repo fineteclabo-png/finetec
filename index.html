@@ -265,12 +265,7 @@ select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='htt
 @media print {
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body > *:not(#printArea) { display:none !important; }
-  #printArea {
-    display:block !important;
-    margin:0 !important;
-    padding:0 !important;
-    background:#fff !important;
-  }
+  #printArea { display:block !important; margin:0 !important; padding:0 !important; background:#fff !important; }
   @page { size:A5 portrait; margin:8mm; }
 }
 </style>
@@ -1213,10 +1208,17 @@ function buildPrintArea(d) {
     +'<tr><td style="'+mtk+'">患者氏名</td><td style="'+mtv+'">'+def(d.patientId)+'</td><td style="'+mtk+'">発行日</td><td style="'+mtvs+'">'+def(d.submittedAt)+'</td></tr>'
     +'<tr><td style="'+mtk+'">年齢・性別</td><td style="'+mtvs+'" colspan="3">'+def(d.patientAge)+' / '+def(d.patientGender)+'</td></tr></table>'
     +'<div style="'+stl+'">&#9650; 納期</div>'
-    +'<table style="'+gt+'">'
-    +'<tr><td style="'+gk+'">指示書発行日</td><td style="'+f+'font-size:12pt;font-weight:bold;padding:3px 6px;border-bottom:1px solid #ddd;" colspan="3">'+def(d.issueDate)+'</td></tr>'
-    +'<tr><td style="'+gk+'">納品希望日</td><td style="'+f+'font-size:12pt;font-weight:bold;padding:3px 6px;border-bottom:1px solid #ddd;" colspan="3">'+def(d.dueDate)+'</td></tr>'
-    +'<tr><td style="'+gk+'">納期</td><td style="'+gvb+'" colspan="3">'+def(d.priority)+'</td></tr>'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:2px;">'
+    +'<tr>'
+    +'<td style="'+gk+'">指示書発行日</td>'
+    +'<td style="'+f+'font-size:11pt;font-weight:bold;padding:2px 6px;border-bottom:1px solid #ddd;width:35%;">'+def(d.issueDate)+'</td>'
+    +'<td style="'+f+'font-size:7.5pt;color:#555;padding:2px 6px;border-bottom:1px solid #ddd;border-left:1px solid #eee;white-space:nowrap;">納期</td>'
+    +'<td style="'+f+'font-size:11pt;font-weight:bold;padding:2px 6px;border-bottom:1px solid #ddd;">'+def(d.priority)+'</td>'
+    +'</tr>'
+    +'<tr>'
+    +'<td style="'+gk+'">納品希望日</td>'
+    +'<td style="'+f+'font-size:11pt;font-weight:bold;padding:2px 6px;border-bottom:1px solid #ddd;" colspan="3">'+def(d.dueDate)+'</td>'
+    +'</tr>'
     +'</table>'
     +'<div style="'+stl+'">&#9650; 補綴物情報'+((d.items&&d.items.length)?'（'+d.items.length+'件）':'')+'</div>'
     +buildItemsHtml()
