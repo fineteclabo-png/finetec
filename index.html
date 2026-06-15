@@ -98,7 +98,8 @@ body{font-family:"BIZ UDPGothic",sans-serif;background:var(--bg);color:var(--tex
 .hist-btn:hover{background:#1a5276;color:#fff}
 .hist-unregistered{font-size:13px;color:#888;font-style:italic}
 .prg-inner{display:flex;justify-content:center;max-width:680px;margin:0 auto}
-.si{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.si{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.si:hover .sn{box-shadow:0 0 0 4px rgba(80,193,233,.18)}
 .si:not(:last-child)::after{content:"";position:absolute;top:14px;left:55%;width:90%;height:2px;background:var(--bdr);transition:background .4s}
 .si.done:not(:last-child)::after,.si.act:not(:last-child)::after{background:var(--acc)}
 .sn{width:28px;height:28px;border-radius:50%;background:var(--bdr);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:all .3s;position:relative;z-index:1}
@@ -324,11 +325,11 @@ select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='htt
 <!-- ═══ PROGRESS ═══ -->
 <div class="prg">
   <div class="prg-inner">
-    <div class="si act" id="si1"><div class="sn">1</div><div class="sl">医院情報</div></div>
-    <div class="si" id="si2"><div class="sn">2</div><div class="sl">患者情報</div></div>
-    <div class="si" id="si3"><div class="sn">3</div><div class="sl">補綴詳細</div></div>
-    <div class="si" id="si4"><div class="sn">4</div><div class="sl">スキャンデータ</div></div>
-    <div class="si" id="si5"><div class="sn">5</div><div class="sl">納期・備考</div></div>
+    <div class="si act" id="si1" onclick="jumpTo(1)"><div class="sn">1</div><div class="sl">医院情報</div></div>
+    <div class="si" id="si2" onclick="jumpTo(2)"><div class="sn">2</div><div class="sl">患者情報</div></div>
+    <div class="si" id="si3" onclick="jumpTo(3)"><div class="sn">3</div><div class="sl">補綴詳細</div></div>
+    <div class="si" id="si4" onclick="jumpTo(4)"><div class="sn">4</div><div class="sl">スキャンデータ</div></div>
+    <div class="si" id="si5" onclick="jumpTo(5)"><div class="sn">5</div><div class="sl">納期・備考</div></div>
   </div>
 </div>
 
@@ -337,7 +338,7 @@ select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='htt
 
   <div class="notice">
     <span style="font-size:16px;flex-shrink:0;margin-top:1px">ℹ️</span>
-    <span>全5ステップで入力します。<strong style="color:var(--req)">必須</strong>の項目を必ずご記入ください。医院名・医師名・電話番号は一度入力すると次回から候補が表示されます。</span>
+    <span>全5ステップで入力します。<strong style="color:var(--req)">必須</strong>の項目を必ずご記入ください。<br><span style="display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--acc);border-radius:20px;padding:4px 14px;margin-top:6px;font-weight:700;font-size:14px;color:var(--pri)">💡 STEP1の歯科医院情報は一度入力すると、同デバイスなら次回から候補表示されます</span><br><span style="display:inline-block;margin-top:6px;font-size:13px;color:var(--muted)">※ 通過済みのSTEPへは、上部のインジケーター番号をタップすると移動できます</span></span>
   </div>
 
   <!-- STEP 1 -->
@@ -1085,6 +1086,17 @@ function validate(step) {
 
 function nxt(from) { if (!validate(from)) return; goTo(from + 1); }
 function prv(from) { goTo(from - 1); }
+function jumpTo(target) {
+  if (target === cur) return;
+  if (target < cur) { goTo(target); return; }
+  // 前方へは、現在ステップ以降を順に検証しながら進む
+  var s = cur;
+  while (s < target) {
+    if (!validate(s)) { goTo(s); return; }
+    s++;
+  }
+  goTo(target);
+}
 function goTo(s) {
   document.getElementById("s" + cur).classList.remove("act");
   cur = s;
