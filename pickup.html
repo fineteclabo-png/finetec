@@ -644,7 +644,7 @@
 
       // 結果画面へ（送信完了モード）
       document.getElementById("resultSub").innerHTML =
-        clinicName + " さんから「<b>模型" + selectedStatus + "</b>」で送信しました。<br>ご連絡ありがとうございました。";
+        clinicName + " 様から「<b>模型" + selectedStatus + "</b>」<br>ご連絡ありがとうございました。";
       resultScreen.setAttribute("data-mode", "submit");
       againBtn.textContent = "もう一度送信する";
       mainScreen.style.display = "none";
@@ -667,7 +667,7 @@
   historyLinkBtn.addEventListener("click", () => {
     if (!clinicName) return;
     resultScreen.setAttribute("data-mode", "history");
-    document.getElementById("resultSub").innerHTML = clinicName + " さんの送信履歴です。";
+    document.getElementById("resultSub").innerHTML = clinicName + " 様の送信履歴です。";
     againBtn.textContent = "入力画面に戻る";
     mainScreen.style.display = "none";
     resultScreen.setAttribute("data-show", "true");
