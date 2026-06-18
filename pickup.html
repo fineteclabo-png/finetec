@@ -717,6 +717,22 @@
       const res = await fetch(url, { method: "GET" });
       const data = await res.json();
 
+      // ===== 一時デバッグ表示（確認が終わったら削除） =====
+      let dbg = document.getElementById("debugBox");
+      if (!dbg) {
+        dbg = document.createElement("div");
+        dbg.id = "debugBox";
+        dbg.style.cssText = "margin-top:16px;padding:10px;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;font-size:10px;color:#000;word-break:break-all;white-space:pre-wrap;font-family:monospace;";
+        document.querySelector(".result").appendChild(dbg);
+      }
+      dbg.textContent =
+        "[DEBUG]\n" +
+        "request clinicKey=[" + clinicKey + "]\n" +
+        "request url=" + url + "\n" +
+        "response status=" + res.status + "\n" +
+        "response body=" + JSON.stringify(data);
+      // ===== デバッグ表示ここまで =====
+
       if (!data || data.result !== "ok") throw new Error("履歴取得失敗");
 
       const items = data.items || [];
