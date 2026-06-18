@@ -542,7 +542,7 @@
 
     <div class="history">
       <div class="history-head">
-        <div class="history-title">本日の送信履歴</div>
+        <div class="history-title">送信履歴（直近5件）</div>
         <div class="history-count" id="historyCount">本日 0件</div>
       </div>
       <div class="history-list" id="historyList">
@@ -717,22 +717,6 @@
       const res = await fetch(url, { method: "GET" });
       const data = await res.json();
 
-      // ===== 一時デバッグ表示（確認が終わったら削除） =====
-      let dbg = document.getElementById("debugBox");
-      if (!dbg) {
-        dbg = document.createElement("div");
-        dbg.id = "debugBox";
-        dbg.style.cssText = "margin-top:16px;padding:10px;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;font-size:10px;color:#000;word-break:break-all;white-space:pre-wrap;font-family:monospace;";
-        document.querySelector(".result").appendChild(dbg);
-      }
-      dbg.textContent =
-        "[DEBUG]\n" +
-        "request clinicKey=[" + clinicKey + "]\n" +
-        "request url=" + url + "\n" +
-        "response status=" + res.status + "\n" +
-        "response body=" + JSON.stringify(data);
-      // ===== デバッグ表示ここまで =====
-
       if (!data || data.result !== "ok") throw new Error("履歴取得失敗");
 
       const items = data.items || [];
@@ -747,7 +731,7 @@
       countEl.textContent = "本日 " + data.todayCount + "件";
 
       if (items.length === 0) {
-        listEl.innerHTML = '<div class="history-empty">本日の送信履歴はまだありません</div>';
+        listEl.innerHTML = '<div class="history-empty">送信履歴はまだありません</div>';
         return;
       }
 
@@ -765,10 +749,11 @@
     return items.map(item => {
       const dotClass = item.status === "あり" ? "has" : "none";
       const memoHtml = item.memo ? '<div class="history-memo">' + escapeHtml(item.memo) + '</div>' : "";
+      const timeLabel = item.date ? (escapeHtml(item.date) + " " + escapeHtml(item.time)) : escapeHtml(item.time);
       return '<div class="history-item">' +
         '<div class="history-dot ' + dotClass + '"></div>' +
         '<div class="history-body">' +
-          '<div class="history-row1"><span>模型' + item.status + '</span><span class="history-time">' + item.time + '</span></div>' +
+          '<div class="history-row1"><span>模型' + item.status + '</span><span class="history-time">' + timeLabel + '</span></div>' +
           memoHtml +
         '</div>' +
       '</div>';
