@@ -699,33 +699,43 @@
 
   // ===== 履歴取得 =====
   // optimisticItem: 送信直後に「サーバー応答を待つ間」だけ仮表示する自分の送信内容。
-  // サーバーから応答が来たら、件数が0件でも必ずその結果で上書きする（仮表示はあくまで見た目のつなぎ）。
-  async function loadHistory(optimisticItem) {
+  // 送信直後はGAS側の書き込みがごく僅かに遅れて反映される場合があるため、
+  // 0件で返ってきても仮表示があるうちは即座に空表示へ切り替えず、少し待って1回だけ再取得する。
+  async function loadHistory(optimisticItem, isRetry) {
     const listEl = document.getElementById("historyList");
     const countEl = document.getElementById("historyCount");
 
-    if (optimisticItem) {
+    if (optimisticItem && !isRetry) {
       countEl.textContent = "本日 1件";
       listEl.innerHTML = renderHistoryItems([optimisticItem]);
-    } else {
+    } else if (!optimisticItem) {
       listEl.innerHTML = '<div class="history-loading">読み込み中...</div>';
     }
 
     try {
-      const url = GAS_URL + "?action=history&clinicKey=" + encodeURIComponent(clinicKey);
+      const url = GAS_URL + "?action=history&clinicKey=" + encodeURIComponent(clinicKey) + "&t=" + Date.now();
       const res = await fetch(url, { method: "GET" });
       const data = await res.json();
 
       if (!data || data.result !== "ok") throw new Error("履歴取得失敗");
 
+      const items = data.items || [];
+
+      // 仮表示があるのにサーバーが0件を返した場合、書き込み反映の遅延を疑い、
+      // 少し待って1回だけ再取得する（仮表示はそのまま維持して画面をちらつかせない）
+      if (optimisticItem && !isRetry && items.length === 0) {
+        setTimeout(() => loadHistory(optimisticItem, true), 1200);
+        return;
+      }
+
       countEl.textContent = "本日 " + data.todayCount + "件";
 
-      if (!data.items || data.items.length === 0) {
+      if (items.length === 0) {
         listEl.innerHTML = '<div class="history-empty">本日の送信履歴はまだありません</div>';
         return;
       }
 
-      listEl.innerHTML = renderHistoryItems(data.items);
+      listEl.innerHTML = renderHistoryItems(items);
 
     } catch (err) {
       // 通信エラー時のみ、仮表示があればそのまま残し、無ければエラー表示にする
