@@ -282,20 +282,22 @@
 
   .history-link-btn {
     width: 100%;
-    border: none;
-    background: none;
+    border: 1.5px solid var(--sky-deep);
+    background: var(--sky-pale);
     color: var(--sky-deep);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
-    padding: 14px 0 4px;
+    padding: 13px 0;
+    border-radius: 14px;
+    margin-top: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 7px;
     cursor: pointer;
   }
   .history-link-btn svg { color: var(--sky-deep); flex-shrink: 0; }
-  .history-link-btn:active { opacity: 0.65; }
+  .history-link-btn:active { transform: scale(0.985); opacity: 0.85; }
 
   /* ===== Result screen ===== */
   .result {
@@ -482,7 +484,7 @@
       </div>
     </div>
     <div class="clinic-name">
-      <span class="label">送信先医院</span>
+      <span class="label">送信元医院</span>
       <span id="clinicNameText">読み込み中...</span>
     </div>
   </div>
@@ -519,7 +521,7 @@
     </button>
 
     <button class="history-link-btn" id="historyLinkBtn">
-      <svg viewBox="0 0 24 24" fill="none" width="15" height="15"><path d="M12 8v4l3 3M21 12a9 9 0 11-9-9 9 9 0 019 9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" width="17" height="17"><path d="M12 8v4l3 3M21 12a9 9 0 11-9-9 9 9 0 019 9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>送信履歴を見る</span>
     </button>
   </div>
